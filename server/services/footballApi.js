@@ -26,7 +26,7 @@ class FootballApiService {
       // Get all matches and filter for live ones
       const response = await axios.get('https://api.football-data.org/v4/matches', {
         headers: {
-          'X-Auth-Token': '1ec51693e261492cb31f2ae3146781b3'
+          'X-Auth-Token': this.apiKey
         }
       });
       
@@ -60,7 +60,7 @@ class FootballApiService {
       // Get all matches and filter for upcoming ones
       const response = await axios.get('https://api.football-data.org/v4/matches', {
         headers: {
-          'X-Auth-Token': '1ec51693e261492cb31f2ae3146781b3'
+          'X-Auth-Token': this.apiKey
         }
       });
       
@@ -94,7 +94,7 @@ class FootballApiService {
       // Get matches from football-data.org v4 API with auth token - exactly like Postman
       const response = await axios.get('https://api.football-data.org/v4/matches', {
         headers: {
-          'X-Auth-Token': '1ec51693e261492cb31f2ae3146781b3'
+          'X-Auth-Token': this.apiKey
         }
       });
       
@@ -121,7 +121,7 @@ class FootballApiService {
     try {
       const response = await axios.get('https://api.football-data.org/v4/competitions', {
         headers: {
-          'X-Auth-Token': '1ec51693e261492cb31f2ae3146781b3'
+          'X-Auth-Token': this.apiKey
         },
         params: { limit: 50 }
       });
