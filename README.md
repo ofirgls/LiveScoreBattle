@@ -1,179 +1,197 @@
-# 🏆 LiveScore Battle - משחק ניחוש תוצאות כדורגל
+# LiveScoreBattle
 
-משחק ניחוש תוצאות כדורגל בזמן אמת בין חברים, עם עדכונים חיים ותחרותיות!
+A real-time football score prediction game for friends, built with modern web technologies.
 
-## ✨ תכונות
+## 🏆 Features
 
-- **משחקים חיים**: צפייה במשחקים שמתקיימים כרגע
-- **ניחוש תוצאות**: שליחת ניחושים למשחקים מתוכננים
-- **עדכונים בזמן אמת**: קבלת עדכונים על ניחושים חדשים מ-Socket.IO
-- **ממשק מודרני**: עיצוב יפה ומותאם למובייל
-- **API כדורגל**: שימוש ב-API חיצוני לקבלת נתוני משחקים
+### Core Functionality
+- **Real-time Match Updates**: Live football matches from football-data.org API
+- **Score Predictions**: Users can predict match outcomes
+- **Live Leaderboard**: Real-time scoring and ranking system
+- **User Authentication**: Secure login/registration system
+- **User Profiles**: Personal statistics and prediction history
 
-## 🛠️ טכנולוגיות
+### Advanced Features
+- **Smart Filtering**: Filter matches by status (Live, Upcoming, Finished) and leagues
+- **Auto-scoring**: Automatic score calculation when matches end
+- **Real-time Updates**: Socket.IO for live predictions and leaderboard updates
+- **Mobile Responsive**: Optimized for all device sizes
+- **Modern UI**: Glassmorphism design with smooth animations
 
-### Backend
-- **Node.js** עם Express
-- **Socket.IO** לתקשורת בזמן אמת
-- **MongoDB** עם Mongoose
-- **Axios** לקריאות API
+## 🚀 Tech Stack
 
 ### Frontend
-- **React** עם Vite
-- **Socket.IO Client** לחיבור בזמן אמת
-- **Axios** לקריאות HTTP
-- **CSS מודרני** עם Glassmorphism
+- **React 18** with Vite
+- **Socket.IO Client** for real-time communication
+- **Axios** for API requests
+- **CSS3** with Glassmorphism design
+- **Responsive Design** for mobile and desktop
 
-## 📦 התקנה והפעלה
+### Backend
+- **Node.js** with Express
+- **Socket.IO** for real-time updates
+- **MongoDB** with Mongoose ODM
+- **JWT** for authentication
+- **bcryptjs** for password hashing
 
-### דרישות מקדימות
-- Node.js (גרסה 16 ומעלה)
-- MongoDB (מותקן ומרוץ)
-- API Key מ-[football-data.org](https://www.football-data.org/)
+### External APIs
+- **football-data.org** for live match data
+- **Real-time scoring** system
 
-### שלב 1: התקנת תלויות
-```bash
-# התקנת כל התלויות (שורש + server + client)
-npm run install-all
-```
+## 📦 Installation
 
-### שלב 2: הגדרת משתני סביבה
-```bash
-# העתק את קובץ הדוגמה
-cp server/env.example server/.env
+### Prerequisites
+- Node.js (v16 or higher)
+- MongoDB (local or cloud)
+- Git
 
-# ערוך את הקובץ עם הפרטים שלך
-nano server/.env
-```
+### Setup Instructions
 
-תוכן קובץ `.env`:
-```env
-PORT=5000
-MONGO_URI=mongodb://localhost:27017/livescore-battle
-API_KEY=your_football_api_key_here
-API_BASE_URL=https://api.football-data.org/v2
-```
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/ofirgls/LiveScoreBattle.git
+   cd LiveScoreBattle
+   ```
 
-### שלב 3: הפעלת הפרויקט
-```bash
-# הפעלת השרת והקליינט במקביל
-npm run dev
-```
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-או בנפרד:
-```bash
-# הפעלת השרת בלבד
-npm run server
+3. **Environment Configuration**
+   
+   Create `.env` file in the `server` directory:
+   ```env
+   PORT=5001
+   MONGO_URI=your_mongodb_connection_string
+   API_KEY=your_football_data_api_key
+   API_BASE_URL=https://api.football-data.org/v4
+   JWT_SECRET=your_super_secret_jwt_key_change_in_production
+   ```
 
-# הפעלת הקליינט בלבד (בטרמינל אחר)
-npm run client
-```
+4. **Start the application**
+   ```bash
+   npm run dev
+   ```
 
-## 🌐 גישה לאפליקציה
+   This will start both the backend server and frontend client concurrently.
 
-- **Frontend**: http://localhost:5173
-- **Backend API**: http://localhost:5000
+## 🎮 How to Play
 
-## 📋 API Endpoints
+### Getting Started
+1. **Register/Login**: Create an account or sign in
+2. **Browse Matches**: View live, upcoming, and finished matches
+3. **Make Predictions**: Predict scores for upcoming matches
+4. **Track Progress**: Monitor your ranking on the leaderboard
+5. **View Profile**: Check your statistics and prediction history
 
-### משחקים
-- `GET /api/matches/live` - משחקים חיים
-- `GET /api/matches/upcoming` - משחקים מתוכננים
+### Scoring System
+- **Exact Score**: 3 points (correct home and away score)
+- **Correct Result**: 1 point (win/loss/draw prediction)
+- **Wrong Prediction**: 0 points
 
-### ניחושים
-- `GET /api/predictions/:matchId` - ניחושים למשחק ספציפי
-- `POST /api/predictions` - יצירת ניחוש חדש
+### Match Statuses
+- **Live**: Currently playing matches
+- **Upcoming**: Scheduled matches (can make predictions)
+- **Finished**: Completed matches (scored automatically)
 
-### Socket.IO Events
-- `newPrediction` - ניחוש חדש נשלח
-- `liveMatchesUpdate` - עדכון משחקים חיים
-- `joinMatch` - הצטרפות לחדר משחק
-- `leaveMatch` - עזיבת חדר משחק
+## 🏗️ Project Structure
 
-## 🎮 איך לשחק
-
-1. **בחר משחק**: לחץ על כרטיס משחק מהרשימה
-2. **הכנס פרטים**: מלא את שמך והתוצאה הצפויה
-3. **שלח ניחוש**: לחץ על "שלח ניחוש"
-4. **צפה בניחושים**: ראה את כל הניחושים של המשתתפים בזמן אמת
-
-## 🔧 פיתוח
-
-### מבנה הפרויקט
 ```
 LiveScoreBattle/
-├── server/                 # Backend
-│   ├── models/            # MongoDB models
-│   ├── services/          # API services
-│   ├── server.js          # Main server file
-│   └── package.json
-├── client/                # Frontend
+├── client/                 # React frontend
 │   ├── src/
-│   │   ├── components/    # React components
-│   │   ├── App.jsx        # Main app component
-│   │   └── main.jsx       # Entry point
+│   │   ├── components/     # React components
+│   │   ├── App.jsx         # Main app component
+│   │   └── index.css       # Global styles
 │   └── package.json
+├── server/                 # Node.js backend
+│   ├── models/            # MongoDB schemas
+│   ├── services/          # Business logic
+│   ├── middleware/        # Express middleware
+│   ├── scripts/           # Database seeding
+│   └── server.js          # Main server file
 └── package.json           # Root package.json
 ```
 
-### פקודות שימושיות
+## 🔧 Configuration
+
+### Environment Variables
+- `PORT`: Server port (default: 5001)
+- `MONGO_URI`: MongoDB connection string
+- `API_KEY`: football-data.org API key
+- `JWT_SECRET`: Secret key for JWT tokens
+
+### API Endpoints
+- `GET /api/matches/live` - Live matches
+- `GET /api/matches/upcoming` - Upcoming matches
+- `GET /api/matches/all` - All matches by competition
+- `POST /api/predictions` - Submit prediction
+- `GET /api/predictions/:matchId` - Get predictions for match
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User login
+- `GET /api/users/leaderboard` - Leaderboard
+
+## 🎨 Features in Detail
+
+### Real-time Updates
+- Live match scores update automatically
+- New predictions appear instantly
+- Leaderboard updates in real-time
+- User notifications for score changes
+
+### Smart Filtering
+- Filter by match status (Live/Upcoming/Finished)
+- Filter by competition/league
+- Combined filtering (status + league)
+- Dynamic match counts
+
+### User Experience
+- Modern glassmorphism design
+- Smooth animations and transitions
+- Mobile-first responsive design
+- Intuitive navigation
+- Real-time feedback
+
+### Security
+- JWT-based authentication
+- Password hashing with bcrypt
+- Protected API endpoints
+- Input validation and sanitization
+
+## 🚀 Deployment
+
+### Local Development
 ```bash
-# התקנת תלויות
-npm run install-all
-
-# הפעלה בפיתוח
-npm run dev
-
-# בניית הפרונט
-npm run build
-
-# הפעלה בפרודקשן
-npm start
+npm run dev          # Start both client and server
+npm run server       # Start server only
+npm run client       # Start client only
 ```
 
-## 🚀 פרודקשן
+### Production
+1. Build the client: `cd client && npm run build`
+2. Set up environment variables
+3. Deploy to your preferred hosting service
 
-### בניית הפרונט
-```bash
-npm run build
-```
+## 🤝 Contributing
 
-### הפעלת השרת בפרודקשן
-```bash
-npm start
-```
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
 
-## 🔒 אבטחה
+## 📝 License
 
-- **CORS** מוגדר לפרונט-אנד
-- **Validation** של קלט המשתמש
-- **MongoDB** עם אינדקסים ייחודיים
-- **Environment Variables** לנתונים רגישים
+This project is open source and available under the [MIT License](LICENSE).
 
-## 🐛 פתרון בעיות
+## 🆘 Support
 
-### MongoDB לא מתחבר
-- ודא ש-MongoDB רץ: `mongod`
-- בדוק את ה-MONGO_URI בקובץ .env
-
-### API לא עובד
-- בדוק שה-API_KEY נכון
-- ודא שה-API_BASE_URL נכון
-- הפרויקט ישתמש בנתוני Mock אם ה-API לא זמין
-
-### Socket.IO לא מתחבר
-- ודא שהשרת רץ על פורט 5000
-- בדוק את הגדרות CORS
-
-## 📝 רישיון
-
-MIT License - חופשי לשימוש ולשינוי
-
-## 🤝 תרומה
-
-תרומות יתקבלו בברכה! אנא צור Pull Request או דווח על באגים ב-Issues.
+For support and questions:
+- Create an issue on GitHub
+- Check the documentation
+- Review the code comments
 
 ---
 
-**בהצלחה במשחק! ⚽🎯**
-# LiveScoreBattle
+**LiveScoreBattle** - Where football predictions meet real-time competition! ⚽🏆
