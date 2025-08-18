@@ -4,6 +4,7 @@ const http = require('http');
 const socketIo = require('socket.io');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');
 const Prediction = require('./models/Prediction');
 const User = require('./models/User');
 const footballApi = require('./services/footballApi');
@@ -17,7 +18,9 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: process.env.NODE_ENV === 'production' 
+      ? ["https://your-app-name.onrender.com", "http://localhost:5173"]
+      : "http://localhost:5173",
     methods: ["GET", "POST"]
   }
 });
@@ -313,6 +316,14 @@ setInterval(async () => {
     console.error('Error updating live matches:', error);
   }
 }, 30000);
+
+// Serve static files from the React build (must be after all API routes)
+app.use(express.static(path.join(__dirname, '../client/dist')));
+
+// Handle React routing, return all requests to React app
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/dist', 'index.html'));
+});
 
 const PORT = process.env.PORT || 5001;
 server.listen(PORT, () => {
