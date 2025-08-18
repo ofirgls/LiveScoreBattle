@@ -11,6 +11,14 @@ class FootballApiService {
         'X-Auth-Token': this.apiKey
       }
     });
+    
+    // Track last log time to avoid spam
+    this.lastLogTime = {
+      live: 0,
+      upcoming: 0,
+      all: 0
+    };
+    this.logInterval = 30000; // 30 seconds between logs
   }
 
   async getLiveMatches() {
@@ -34,7 +42,12 @@ class FootballApiService {
         }
       }
       
-      console.log('⚠️ No live matches available from football-data.org');
+      // Only log if enough time has passed since last log
+      const now = Date.now();
+      if (now - this.lastLogTime.live > this.logInterval) {
+        console.log('⚠️ No live matches available from football-data.org');
+        this.lastLogTime.live = now;
+      }
       return [];
     } catch (error) {
       console.error('Error fetching live matches:', error.message);
@@ -63,7 +76,12 @@ class FootballApiService {
         }
       }
       
-      console.log('⚠️ No upcoming matches available from football-data.org');
+      // Only log if enough time has passed since last log
+      const now = Date.now();
+      if (now - this.lastLogTime.upcoming > this.logInterval) {
+        console.log('⚠️ No upcoming matches available from football-data.org');
+        this.lastLogTime.upcoming = now;
+      }
       return [];
     } catch (error) {
       console.error('Error fetching upcoming matches:', error.message);
@@ -86,7 +104,12 @@ class FootballApiService {
         return this.formatMatches(response.data.matches);
       }
       
-      console.log('⚠️ No matches available from football-data.org');
+      // Only log if enough time has passed since last log
+      const now = Date.now();
+      if (now - this.lastLogTime.all > this.logInterval) {
+        console.log('⚠️ No matches available from football-data.org');
+        this.lastLogTime.all = now;
+      }
       return [];
     } catch (error) {
       console.error('Error fetching all matches:', error.message);
