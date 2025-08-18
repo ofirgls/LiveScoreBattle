@@ -94,10 +94,20 @@ app.get('/api/competitions', async (req, res) => {
 
 app.get('/api/predictions/:matchId', async (req, res) => {
   try {
-    const predictions = await Prediction.find({ matchId: req.params.matchId })
+    // Special handling for demo match
+    if (req.params.matchId === 'demo-match-123') {
+      console.log('🎮 Fetching predictions for demo match');
+      const predictions = await Prediction.find({ matchId: req.params.matchId })
+        .sort({ createdAt: -1 });
+      res.json(predictions);
+      return;
+    }
+
+    const predictions = await Prediction.find({ matchId: String(req.params.matchId) })
       .sort({ createdAt: -1 });
     res.json(predictions);
   } catch (error) {
+    console.error('Error fetching predictions:', error);
     res.status(500).json({ error: 'Failed to fetch predictions' });
   }
 });
@@ -106,6 +116,11 @@ app.post('/api/predictions', authenticateToken, async (req, res) => {
   try {
     const { matchId, homeScore, awayScore, matchInfo } = req.body;
     const user = req.user.username; // Get username from authenticated user
+    
+    // Special handling for demo match
+    if (matchId === 'demo-match-123') {
+      console.log(`🎮 Demo match prediction from ${user}: ${homeScore}-${awayScore}`);
+    }
     
     // Validate input
     if (!matchId || homeScore === undefined || awayScore === undefined) {
@@ -121,7 +136,7 @@ app.post('/api/predictions', authenticateToken, async (req, res) => {
     }
 
     // Check if user already predicted this match
-    const existingPrediction = await Prediction.findOne({ user, matchId });
+    const existingPrediction = await Prediction.findOne({ user, matchId: String(matchId) });
     if (existingPrediction) {
       return res.status(400).json({ error: 'כבר ניחשת את המשחק הזה' });
     }
@@ -129,7 +144,7 @@ app.post('/api/predictions', authenticateToken, async (req, res) => {
     // Create new prediction
     const prediction = new Prediction({
       user,
-      matchId,
+      matchId: String(matchId),
       homeScore,
       awayScore,
       matchInfo
@@ -142,6 +157,7 @@ app.post('/api/predictions', authenticateToken, async (req, res) => {
 
     res.status(201).json(prediction);
   } catch (error) {
+    console.error('Error creating prediction:', error);
     if (error.code === 11000) {
       return res.status(400).json({ error: 'כבר ניחשת את המשחק הזה' });
     }

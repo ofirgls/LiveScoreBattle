@@ -79,7 +79,7 @@ class AutoScoringService {
 
       // Check if this match has already been scored
       const existingPredictions = await Prediction.find({ 
-        matchId: match.id,
+        matchId: String(match.id),
         isScored: true 
       });
 
@@ -92,7 +92,7 @@ class AutoScoringService {
 
       // Check if there are any predictions for this match
       const predictions = await Prediction.find({ 
-        matchId: match.id,
+        matchId: String(match.id),
         isScored: false 
       });
 

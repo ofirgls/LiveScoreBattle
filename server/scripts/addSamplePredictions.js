@@ -7,7 +7,7 @@ const samplePredictions = [
   // Match 1: מכבי תל אביב vs הפועל תל אביב (FINISHED: 2-1)
   {
     user: 'עומר_המקצוען',
-    matchId: 1,
+    matchId: '1',
     homeScore: 2,
     awayScore: 1,
     matchInfo: {
@@ -19,7 +19,7 @@ const samplePredictions = [
   },
   {
     user: 'מיכל_המתחרה',
-    matchId: 1,
+    matchId: '1',
     homeScore: 1,
     awayScore: 0,
     matchInfo: {
@@ -31,7 +31,7 @@ const samplePredictions = [
   },
   {
     user: 'דוד_המנצח',
-    matchId: 1,
+    matchId: '1',
     homeScore: 2,
     awayScore: 1,
     matchInfo: {
@@ -45,7 +45,7 @@ const samplePredictions = [
   // Match 2: בית"ר ירושלים vs מכבי חיפה (FINISHED: 0-2)
   {
     user: 'תמר_המתמטיקאית',
-    matchId: 2,
+    matchId: '2',
     homeScore: 0,
     awayScore: 2,
     matchInfo: {
@@ -57,7 +57,7 @@ const samplePredictions = [
   },
   {
     user: 'יוסי_הכדורגלן',
-    matchId: 2,
+    matchId: '2',
     homeScore: 1,
     awayScore: 1,
     matchInfo: {
@@ -69,7 +69,7 @@ const samplePredictions = [
   },
   {
     user: 'שרה_המנחשה',
-    matchId: 2,
+    matchId: '2',
     homeScore: 0,
     awayScore: 1,
     matchInfo: {
@@ -83,7 +83,7 @@ const samplePredictions = [
   // Match 3: הפועל באר שבע vs מכבי נתניה (FINISHED: 3-0)
   {
     user: 'דניאל_המאמן',
-    matchId: 3,
+    matchId: '3',
     homeScore: 3,
     awayScore: 0,
     matchInfo: {
@@ -95,7 +95,7 @@ const samplePredictions = [
   },
   {
     user: 'רון_הסטטיסטיקאי',
-    matchId: 3,
+    matchId: '3',
     homeScore: 2,
     awayScore: 0,
     matchInfo: {
@@ -107,7 +107,7 @@ const samplePredictions = [
   },
   {
     user: 'ליאור_האוהד',
-    matchId: 3,
+    matchId: '3',
     homeScore: 1,
     awayScore: 1,
     matchInfo: {
@@ -121,7 +121,7 @@ const samplePredictions = [
   // Match 4: הפועל חיפה vs מכבי פתח תקווה (LIVE: 1-1)
   {
     user: 'נועה_החדשה',
-    matchId: 4,
+    matchId: '4',
     homeScore: 1,
     awayScore: 1,
     matchInfo: {
@@ -133,7 +133,7 @@ const samplePredictions = [
   },
   {
     user: 'עומר_המקצוען',
-    matchId: 4,
+    matchId: '4',
     homeScore: 2,
     awayScore: 0,
     matchInfo: {

@@ -45,7 +45,7 @@ class MatchEventListener {
       const matches = await footballApi.getLiveMatches();
       
       matches.forEach(match => {
-        this.matchStatuses.set(match.id, {
+        this.matchStatuses.set(String(match.id), {
           status: match.status,
           homeScore: match.homeScore,
           awayScore: match.awayScore,
@@ -109,12 +109,12 @@ class MatchEventListener {
       matches.forEach(match => {
         if (match.isDemo) return; // Skip demo match as it's handled above
         
-        const currentStatus = this.matchStatuses.get(match.id);
+        const currentStatus = this.matchStatuses.get(String(match.id));
         
         if (!currentStatus) {
           // New match found
           console.log(`🆕 New match detected: ${match.homeTeam} vs ${match.awayTeam} (${match.status})`);
-          this.matchStatuses.set(match.id, {
+          this.matchStatuses.set(String(match.id), {
             status: match.status,
             homeScore: match.homeScore,
             awayScore: match.awayScore,
@@ -136,7 +136,7 @@ class MatchEventListener {
         }
 
         // Update current status
-        this.matchStatuses.set(match.id, {
+        this.matchStatuses.set(String(match.id), {
           status: match.status,
           homeScore: match.homeScore,
           awayScore: match.awayScore,
