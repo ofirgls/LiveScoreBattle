@@ -72,6 +72,11 @@ class AutoScoringService {
   // Score a match if it hasn't been scored yet
   async scoreMatchIfNotScored(match) {
     try {
+      // Special handling for demo match
+      if (match.isDemo) {
+        console.log(`🎮 Demo match scoring: ${match.homeTeam} ${match.homeScore} - ${match.awayScore} ${match.awayTeam}`);
+      }
+
       // Check if this match has already been scored
       const existingPredictions = await Prediction.find({ 
         matchId: match.id,
@@ -79,6 +84,9 @@ class AutoScoringService {
       });
 
       if (existingPredictions.length > 0) {
+        if (match.isDemo) {
+          console.log(`🎮 Demo match already scored, skipping...`);
+        }
         return; // Already scored, no need to log
       }
 
@@ -89,10 +97,17 @@ class AutoScoringService {
       });
 
       if (predictions.length === 0) {
+        if (match.isDemo) {
+          console.log(`🎮 Demo match has no predictions, skipping...`);
+        }
         return; // No predictions, no need to log
       }
 
-      console.log(`🎯 משחק הסתיים! ניקוד אוטומטי למשחק ${match.id}: ${match.homeTeam} ${match.homeScore} - ${match.awayScore} ${match.awayTeam}`);
+      if (match.isDemo) {
+        console.log(`🎮 Demo match finished! Scoring ${predictions.length} predictions for: ${match.homeTeam} ${match.homeScore} - ${match.awayScore} ${match.awayTeam}`);
+      } else {
+        console.log(`🎯 משחק הסתיים! ניקוד אוטומטי למשחק ${match.id}: ${match.homeTeam} ${match.homeScore} - ${match.awayScore} ${match.awayTeam}`);
+      }
 
       // Score all predictions for this match
       let scoredCount = 0;
@@ -130,10 +145,18 @@ class AutoScoringService {
         scoredCount++;
       }
 
-      console.log(`✅ ניקוד הושלם! ${scoredCount} ניחושים קיבלו נקודות למשחק ${match.id}`);
+      if (match.isDemo) {
+        console.log(`🎮 Demo match scoring completed! ${scoredCount} predictions scored for: ${match.homeTeam} ${match.homeScore} - ${match.awayScore} ${match.awayTeam}`);
+      } else {
+        console.log(`✅ ניקוד הושלם! ${scoredCount} ניחושים קיבלו נקודות למשחק ${match.id}`);
+      }
 
     } catch (error) {
-      console.error(`❌ שגיאה בניקוד משחק ${match.id}:`, error);
+      if (match.isDemo) {
+        console.error(`🎮 Error scoring demo match ${match.id}:`, error);
+      } else {
+        console.error(`❌ שגיאה בניקוד משחק ${match.id}:`, error);
+      }
     }
   }
 

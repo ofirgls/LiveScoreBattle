@@ -34,10 +34,17 @@ const MatchCard = ({ match, isSelected, onSelect, onViewPredictions }) => {
 
   return (
     <div 
-      className={`match-card ${isSelected ? 'selected' : ''}`}
-      style={{ cursor: isMatchActive ? 'default' : 'pointer' }}
+      className={`match-card ${isSelected ? 'selected' : ''} ${isMatchActive ? 'active' : ''}`}
     >
-      <div className="match-card-content" onClick={isMatchActive ? undefined : onSelect}>
+      <div 
+        className="match-card-content" 
+        onClick={(e) => {
+          console.log('Match card clicked:', match.id, match.homeTeam, 'vs', match.awayTeam, 'Status:', match.status);
+          if (!isMatchActive) {
+            onSelect();
+          }
+        }}
+      >
       <div className="match-header">
         <span className="competition">{match.competition}</span>
         <span className={`status ${match.status.toLowerCase()}`}>

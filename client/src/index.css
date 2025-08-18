@@ -71,11 +71,22 @@ body {
   padding: 20px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
 }
 
 .match-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.match-card.active {
+  cursor: default;
+  transform: none;
+}
+
+.match-card.active:hover {
+  transform: none;
+  box-shadow: none;
 }
 
 .match-header {

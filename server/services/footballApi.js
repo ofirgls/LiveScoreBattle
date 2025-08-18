@@ -135,7 +135,7 @@ class FootballApiService {
 
 
   formatMatches(matches) {
-    return matches.map(match => {
+    const formattedMatches = matches.map(match => {
       // Get current score based on match status
       let homeScore = 0;
       let awayScore = 0;
@@ -167,6 +167,75 @@ class FootballApiService {
         } : null
       };
     });
+
+    // Add demo match for testing
+    const demoMatch = this.getDemoMatch();
+    if (demoMatch) {
+      formattedMatches.unshift(demoMatch);
+    }
+
+    return formattedMatches;
+  }
+
+  getDemoMatch() {
+    const now = new Date();
+    const demoMatchTime = new Date(now.getTime() + 2 * 60 * 1000); // 2 minutes from now
+    const demoEndTime = new Date(now.getTime() + 4 * 60 * 1000); // 4 minutes from now
+    
+    // Check if demo match should be finished
+    if (now >= demoEndTime) {
+      return {
+        id: 'demo-match-123',
+        homeTeam: 'מכבי תל אביב',
+        awayTeam: 'הפועל באר שבע',
+        competition: 'ליגת העל - משחק דמה',
+        competitionId: 999,
+        status: 'FINISHED',
+        homeScore: 2,
+        awayScore: 1,
+        matchDate: demoMatchTime.toISOString(),
+        minute: 90,
+        finalScore: {
+          home: 2,
+          away: 1
+        },
+        isDemo: true
+      };
+    }
+    
+    // Check if demo match should be live
+    if (now >= demoMatchTime && now < demoEndTime) {
+      return {
+        id: 'demo-match-123',
+        homeTeam: 'מכבי תל אביב',
+        awayTeam: 'הפועל באר שבע',
+        competition: 'ליגת העל - משחק דמה',
+        competitionId: 999,
+        status: 'LIVE',
+        homeScore: 1,
+        awayScore: 0,
+        matchDate: demoMatchTime.toISOString(),
+        minute: 45,
+        finalScore: null,
+        isDemo: true
+      };
+    }
+    
+    // Demo match is still scheduled
+    return {
+      id: 'demo-match-123',
+      homeTeam: 'מכבי תל אביב',
+      awayTeam: 'הפועל באר שבע',
+      competition: 'ליגת העל - משחק דמה',
+      competitionId: 999,
+      status: 'SCHEDULED',
+      homeScore: 0,
+      awayScore: 0,
+      matchDate: demoMatchTime.toISOString(),
+      minute: 0,
+      finalScore: null,
+      isDemo: true
+    };
   }
 
 

@@ -312,6 +312,10 @@ setInterval(async () => {
   try {
     const liveMatches = await footballApi.getLiveMatches();
     io.emit('liveMatchesUpdate', liveMatches);
+    
+    // Also update all matches to include demo match status changes
+    const allMatches = await footballApi.getAllMatches();
+    io.emit('allMatchesUpdate', allMatches);
   } catch (error) {
     console.error('Error updating live matches:', error);
   }

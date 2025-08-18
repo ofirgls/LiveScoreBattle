@@ -114,6 +114,7 @@ function App() {
   };
 
   const handleMatchSelect = async (match) => {
+    console.log('handleMatchSelect called with:', match);
     setSelectedMatch(match);
     setMessage(null);
     
