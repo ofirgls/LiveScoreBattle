@@ -138,7 +138,7 @@ const PredictionsList = ({ predictions, onRefresh, match, onClose, currentUser, 
 
           {isMatchActive && (
             <div className="match-active-message">
-              <p>❌ לא ניתן לנחש על משחק זה - המשחק {match.status === 'FINISHED' ? 'הסתיים' : 'בשידור חי'}</p>
+              <p>❌ לא ניתן לנחש על משחק זה - המשחק {match.status === 'FINISHED' ? 'הסתיים' : 'שידור חי'}</p>
             </div>
           )}
 
@@ -153,14 +153,41 @@ const PredictionsList = ({ predictions, onRefresh, match, onClose, currentUser, 
               <div className="predictions-items">
                 {predictions.map((prediction, index) => (
                   <div key={prediction._id || index} className="prediction-item">
-                    <div>
+                    <div className="prediction-user-info">
                       <span className="prediction-user">{prediction.user}</span>
                       <div className="prediction-time">
                         {formatTime(prediction.createdAt)}
                       </div>
                     </div>
-                    <div className="prediction-score">
-                      {prediction.homeScore} - {prediction.awayScore}
+                    <div className="prediction-scores">
+                      <div className="score-comparison">
+                        <span className="predicted-score">
+                          ניחוש: {prediction.homeScore} - {prediction.awayScore}
+                        </span>
+                        {prediction.isScored && prediction.actualHomeScore !== null && prediction.actualAwayScore !== null && (
+                          <span className="actual-score">
+                            תוצאה: {prediction.actualHomeScore} - {prediction.actualAwayScore}
+                          </span>
+                        )}
+                      </div>
+                      {prediction.isScored && (
+                        <div className="prediction-result">
+                          {prediction.points !== undefined && (
+                            <span className={`prediction-points ${prediction.points > 0 ? 'positive' : 'neutral'}`}>
+                              {prediction.points} נקודות
+                            </span>
+                          )}
+                          {prediction.isExactScore && (
+                            <span className="result-badge exact">🎯 מדויק</span>
+                          )}
+                          {prediction.isCorrectResult && !prediction.isExactScore && (
+                            <span className="result-badge correct">✅ נכון</span>
+                          )}
+                          {!prediction.isCorrectResult && (
+                            <span className="result-badge wrong">❌ שגוי</span>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}

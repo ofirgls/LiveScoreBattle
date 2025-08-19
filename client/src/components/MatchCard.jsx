@@ -15,15 +15,14 @@ const MatchCard = ({ match, isSelected, onSelect, onViewPredictions }) => {
   const getStatusText = (status) => {
     switch (status) {
       case 'LIVE':
-        return 'בשידור חי';
+      case 'IN_PLAY':
+        return 'שידור חי';
       case 'SCHEDULED':
+      case 'TIMED':
         return 'מתוכנן';
       case 'FINISHED':
-        return 'הסתיים';
       case 'PAUSED':
-        return 'מושהה';
-      case 'IN_PLAY':
-        return 'בשידור חי';
+        return 'הסתיים';
       default:
         return status;
     }

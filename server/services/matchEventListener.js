@@ -45,7 +45,7 @@ class MatchEventListener {
       const matches = await footballApi.getLiveMatches();
       
       matches.forEach(match => {
-        this.matchStatuses.set(String(match.id), {
+        this.matchStatuses.set(match.id, {
           status: match.status,
           homeScore: match.homeScore,
           awayScore: match.awayScore,
@@ -68,53 +68,17 @@ class MatchEventListener {
       let statusChanges = 0;
       let finishedMatches = [];
 
-      // Special handling for demo match
-      const demoMatch = matches.find(match => match.isDemo);
-      if (demoMatch) {
-        const currentStatus = this.matchStatuses.get(demoMatch.id);
-        
-        if (!currentStatus) {
-          // New demo match found
-          console.log(`🎮 Demo match detected: ${demoMatch.homeTeam} vs ${demoMatch.awayTeam} (${demoMatch.status})`);
-          this.matchStatuses.set(demoMatch.id, {
-            status: demoMatch.status,
-            homeScore: demoMatch.homeScore,
-            awayScore: demoMatch.awayScore,
-            lastUpdate: new Date(),
-            isDemo: true
-          });
-        } else if (currentStatus.status !== demoMatch.status) {
-          // Demo match status changed
-          console.log(`🎮 Demo match status change: ${currentStatus.status} → ${demoMatch.status}`);
-          
-          if (demoMatch.status === 'FINISHED') {
-            finishedMatches.push(demoMatch);
-            console.log(`🎮 Demo match finished: ${demoMatch.homeTeam} ${demoMatch.homeScore} - ${demoMatch.awayScore} ${demoMatch.awayTeam}`);
-          }
-          
-          statusChanges++;
-        }
 
-        // Update demo match status
-        this.matchStatuses.set(demoMatch.id, {
-          status: demoMatch.status,
-          homeScore: demoMatch.homeScore,
-          awayScore: demoMatch.awayScore,
-          lastUpdate: new Date(),
-          isDemo: true
-        });
-      }
 
-      // Handle regular matches
+      // Handle matches
       matches.forEach(match => {
-        if (match.isDemo) return; // Skip demo match as it's handled above
         
-        const currentStatus = this.matchStatuses.get(String(match.id));
+        const currentStatus = this.matchStatuses.get(match.id);
         
         if (!currentStatus) {
           // New match found
           console.log(`🆕 New match detected: ${match.homeTeam} vs ${match.awayTeam} (${match.status})`);
-          this.matchStatuses.set(String(match.id), {
+          this.matchStatuses.set(match.id, {
             status: match.status,
             homeScore: match.homeScore,
             awayScore: match.awayScore,
@@ -136,7 +100,7 @@ class MatchEventListener {
         }
 
         // Update current status
-        this.matchStatuses.set(String(match.id), {
+        this.matchStatuses.set(match.id, {
           status: match.status,
           homeScore: match.homeScore,
           awayScore: match.awayScore,
@@ -148,6 +112,7 @@ class MatchEventListener {
       if (finishedMatches.length > 0) {
         console.log(`🎯 Processing ${finishedMatches.length} finished matches...`);
         for (const match of finishedMatches) {
+          console.log(`🏁 Scoring match: ${match.homeTeam} ${match.homeScore} - ${match.awayScore} ${match.awayTeam}`);
           await autoScoringService.scoreMatchIfNotScored(match);
         }
       }

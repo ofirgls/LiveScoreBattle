@@ -75,7 +75,7 @@ const PredictionForm = ({ match, onSubmit, currentUser }) => {
         
         {isMatchActive ? (
           <div className="match-active-message">
-            <p>❌ לא ניתן לנחש על משחק זה - המשחק {match.status === 'FINISHED' ? 'הסתיים' : 'בשידור חי'}</p>
+            <p>❌ לא ניתן לנחש על משחק זה - המשחק {match.status === 'FINISHED' ? 'הסתיים' : 'שידור חי'}</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit}>

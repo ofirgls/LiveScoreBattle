@@ -25,6 +25,9 @@ const io = socketIo(server, {
   }
 });
 
+// Make io globally available for services
+global.io = io;
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -94,14 +97,7 @@ app.get('/api/competitions', async (req, res) => {
 
 app.get('/api/predictions/:matchId', async (req, res) => {
   try {
-    // Special handling for demo match
-    if (req.params.matchId === 'demo-match-123') {
-      console.log('🎮 Fetching predictions for demo match');
-      const predictions = await Prediction.find({ matchId: req.params.matchId })
-        .sort({ createdAt: -1 });
-      res.json(predictions);
-      return;
-    }
+
 
     const predictions = await Prediction.find({ matchId: String(req.params.matchId) })
       .sort({ createdAt: -1 });
@@ -117,10 +113,7 @@ app.post('/api/predictions', authenticateToken, async (req, res) => {
     const { matchId, homeScore, awayScore, matchInfo } = req.body;
     const user = req.user.username; // Get username from authenticated user
     
-    // Special handling for demo match
-    if (matchId === 'demo-match-123') {
-      console.log(`🎮 Demo match prediction from ${user}: ${homeScore}-${awayScore}`);
-    }
+
     
     // Validate input
     if (!matchId || homeScore === undefined || awayScore === undefined) {
@@ -185,6 +178,69 @@ app.get('/api/users/:username/stats', async (req, res) => {
     res.json(stats);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch user stats' });
+  }
+});
+
+// Manual scoring endpoint for testing
+app.post('/api/admin/score-match', async (req, res) => {
+  try {
+    const { matchId } = req.body;
+    
+    if (!matchId) {
+      return res.status(400).json({ error: 'Match ID is required' });
+    }
+
+    // Get the match from API
+    const matches = await footballApi.getAllMatches();
+    let targetMatch = null;
+    
+    // Find the match in all competitions
+    for (const competition of Object.values(matches)) {
+      const match = competition.find(m => m.id === matchId);
+      if (match) {
+        targetMatch = match;
+        break;
+      }
+    }
+
+    if (!targetMatch) {
+      return res.status(404).json({ error: 'Match not found' });
+    }
+
+    if (targetMatch.status !== 'FINISHED') {
+      return res.status(400).json({ error: 'Match is not finished' });
+    }
+
+    // Score the match
+    await autoScoringService.scoreMatchIfNotScored(targetMatch);
+    
+    res.json({ message: `Match ${matchId} scored successfully` });
+  } catch (error) {
+    console.error('Error in manual scoring:', error);
+    res.status(500).json({ error: 'Failed to score match' });
+  }
+});
+
+// Delete predictions for a specific match
+app.delete('/api/admin/delete-predictions/:matchId', async (req, res) => {
+  try {
+    const { matchId } = req.params;
+    
+    if (!matchId) {
+      return res.status(400).json({ error: 'Match ID is required' });
+    }
+
+    console.log(`🗑️ Deleting predictions for match ${matchId}`);
+    
+    const result = await Prediction.deleteMany({ matchId: String(matchId) });
+    
+    res.json({ 
+      message: `Deleted ${result.deletedCount} predictions for match ${matchId}`,
+      deletedCount: result.deletedCount
+    });
+  } catch (error) {
+    console.error('Error deleting predictions:', error);
+    res.status(500).json({ error: 'Failed to delete predictions' });
   }
 });
 
@@ -308,19 +364,40 @@ io.on('connection', (socket) => {
     console.log(`User ${socket.id} left match ${matchId}`);
   });
 
-      socket.on('disconnect', () => {
-      console.log('User disconnected:', socket.id);
-    });
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+  });
 
-    // Send initial leaderboard
-    socket.on('getLeaderboard', async () => {
-      try {
-        const leaderboard = await scoringService.getLeaderboard();
-        socket.emit('leaderboardUpdate', leaderboard);
-      } catch (error) {
-        console.error('Error sending leaderboard:', error);
-      }
-    });
+  // Send initial leaderboard
+  socket.on('getLeaderboard', async () => {
+    try {
+      const leaderboard = await scoringService.getLeaderboard();
+      socket.emit('leaderboardUpdate', leaderboard);
+    } catch (error) {
+      console.error('Error sending leaderboard:', error);
+    }
+  });
+
+  // Send user stats
+  socket.on('getUserStats', async (username) => {
+    try {
+      const stats = await scoringService.getUserStats(username);
+      socket.emit('userStatsUpdate', stats);
+    } catch (error) {
+      console.error('Error sending user stats:', error);
+    }
+  });
+
+  // Send predictions for a match
+  socket.on('getMatchPredictions', async (matchId) => {
+    try {
+      const predictions = await Prediction.find({ matchId: String(matchId) })
+        .sort({ createdAt: -1 });
+      socket.emit('matchPredictionsUpdate', predictions);
+    } catch (error) {
+      console.error('Error sending match predictions:', error);
+    }
+  });
 });
 
 // Update live matches every 30 seconds
@@ -329,9 +406,16 @@ setInterval(async () => {
     const liveMatches = await footballApi.getLiveMatches();
     io.emit('liveMatchesUpdate', liveMatches);
     
-    // Also update all matches to include demo match status changes
+    // Also update all matches
     const allMatches = await footballApi.getAllMatches();
     io.emit('allMatchesUpdate', allMatches);
+    
+    // Check for finished matches and score them
+    const finishedMatches = allMatches.filter(match => match.status === 'FINISHED');
+    for (const match of finishedMatches) {
+      console.log(`🏁 Checking finished match: ${match.homeTeam} ${match.homeScore} - ${match.awayScore} ${match.awayTeam}`);
+      await autoScoringService.scoreMatchIfNotScored(match);
+    }
   } catch (error) {
     console.error('Error updating live matches:', error);
   }
@@ -355,4 +439,8 @@ server.listen(PORT, () => {
   
   // Start smart match event listener
   matchEventListener.start();
+  
+  console.log(`🎯 Automatic scoring system is active`);
+  console.log(`🎧 Match event listener is active`);
+  console.log(`📡 Socket.IO server is ready for real-time updates`);
 });

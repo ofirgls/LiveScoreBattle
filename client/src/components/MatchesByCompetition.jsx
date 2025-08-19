@@ -91,7 +91,7 @@ const MatchesByCompetition = ({
             className={`status-btn ${selectedStatus === 'live' ? 'active' : ''}`}
             onClick={() => onSelectStatus('live')}
           >
-            🔴 בשידור חי
+            🔴 שידור חי
           </button>
           <button
             className={`status-btn ${selectedStatus === 'upcoming' ? 'active' : ''}`}

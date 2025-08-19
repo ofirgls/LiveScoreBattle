@@ -483,6 +483,108 @@ body {
   color: rgba(255, 255, 255, 0.7);
 }
 
+/* New styles for prediction comparison */
+.prediction-scores {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.score-comparison {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.predicted-score {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #ffa502;
+}
+
+.actual-score {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #2ed573;
+}
+
+.prediction-result {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.result-details {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.result-badge {
+  font-size: 0.8rem;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.result-badge.exact {
+  background: rgba(46, 213, 115, 0.2);
+  color: #2ed573;
+  border: 1px solid rgba(46, 213, 115, 0.3);
+}
+
+.result-badge.correct {
+  background: rgba(255, 165, 2, 0.2);
+  color: #ffa502;
+  border: 1px solid rgba(255, 165, 2, 0.3);
+}
+
+.result-badge.wrong {
+  background: rgba(255, 71, 87, 0.2);
+  color: #ff4757;
+  border: 1px solid rgba(255, 71, 87, 0.3);
+}
+
+.pending-result {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-style: italic;
+}
+
+.accuracy-badge {
+  font-size: 0.8rem;
+  font-weight: bold;
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.live-indicator {
+  color: #ff4757;
+  font-weight: bold;
+  font-size: 0.9rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 /* Prediction Modal */
 .prediction-modal-overlay {
   position: fixed;
@@ -586,6 +688,25 @@ body {
     font-size: 1.1rem;
     text-align: center;
   }
+  
+  /* Position close button to top-right in mobile */
+  .predictions-modal-header .close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 10;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+  }
+  
+  .prediction-modal-header .close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 10;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+  }
 }
 
 .predictions-content {
@@ -605,6 +726,104 @@ body {
     padding-bottom: 15px;
     margin-bottom: 15px;
   }
+}
+
+/* Error Modal */
+.error-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  backdrop-filter: blur(5px);
+}
+
+.error-modal {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(15px);
+  border-radius: 20px;
+  padding: 0;
+  max-width: 400px;
+  width: 90%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.error-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 25px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 71, 87, 0.1);
+  border-radius: 20px 20px 0 0;
+}
+
+.error-modal-header h3 {
+  margin: 0;
+  color: #ff4757;
+  font-size: 1.3rem;
+}
+
+.error-modal-content {
+  padding: 25px;
+  text-align: center;
+}
+
+.error-modal-content p {
+  margin: 0;
+  color: white;
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+.error-modal-footer {
+  padding: 20px 25px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+}
+
+.error-ok-btn {
+  background: linear-gradient(135deg, #ff4757, #ff3742);
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.error-ok-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 71, 87, 0.3);
+}
+
+/* Mobile responsive for error modal */
+@media (max-width: 768px) {
+  .error-modal {
+    width: 95%;
+    max-width: 350px;
+  }
+  
+  .error-modal-header {
+    padding: 15px 20px;
+  }
+  
+  .error-modal-content {
+    padding: 20px;
+  }
+  
+  .error-modal-footer {
+    padding: 15px 20px;
+  }
+}
   
   .predictions-list-section {
     padding-top: 5px;
@@ -754,17 +973,26 @@ body {
 .prediction-item {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 10px;
+  align-items: flex-start;
+  padding: 15px;
   margin-bottom: 10px;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   border-left: 4px solid #667eea;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .prediction-user {
   font-weight: bold;
   color: #ffa502;
+  font-size: 1.1rem;
+}
+
+.prediction-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 
 .prediction-score {
@@ -1125,6 +1353,7 @@ body {
 .scoring-info h4 {
   margin-bottom: 15px;
   color: #ffa502;
+  text-align: center;
 }
 
 .scoring-rules {

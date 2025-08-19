@@ -39,10 +39,15 @@ class AutoScoringService {
       const matches = await footballApi.getLiveMatches();
       const finishedMatches = matches.filter(match => match.status === 'FINISHED');
       
+      console.log(`🔍 Found ${finishedMatches.length} finished matches to check`);
+      
       // Check each finished match
       for (const match of finishedMatches) {
+        console.log(`🏁 Checking finished match: ${match.homeTeam} ${match.homeScore} - ${match.awayScore} ${match.awayTeam}`);
         await this.scoreMatchIfNotScored(match);
       }
+
+
 
     } catch (error) {
       console.error('❌ Error checking for match endings:', error);
@@ -61,6 +66,7 @@ class AutoScoringService {
       console.log(`Found ${finishedMatches.length} finished matches`);
 
       for (const match of finishedMatches) {
+        console.log(`🏁 Checking finished match: ${match.homeTeam} ${match.homeScore} - ${match.awayScore} ${match.awayTeam}`);
         await this.scoreMatchIfNotScored(match);
       }
 
@@ -72,10 +78,7 @@ class AutoScoringService {
   // Score a match if it hasn't been scored yet
   async scoreMatchIfNotScored(match) {
     try {
-      // Special handling for demo match
-      if (match.isDemo) {
-        console.log(`🎮 Demo match scoring: ${match.homeTeam} ${match.homeScore} - ${match.awayScore} ${match.awayTeam}`);
-      }
+
 
       // Check if this match has already been scored
       const existingPredictions = await Prediction.find({ 
@@ -84,9 +87,7 @@ class AutoScoringService {
       });
 
       if (existingPredictions.length > 0) {
-        if (match.isDemo) {
-          console.log(`🎮 Demo match already scored, skipping...`);
-        }
+        console.log(`✅ Match ${match.id} already scored, skipping...`);
         return; // Already scored, no need to log
       }
 
@@ -97,17 +98,11 @@ class AutoScoringService {
       });
 
       if (predictions.length === 0) {
-        if (match.isDemo) {
-          console.log(`🎮 Demo match has no predictions, skipping...`);
-        }
+        console.log(`⚠️ Match ${match.id} has no predictions, skipping...`);
         return; // No predictions, no need to log
       }
 
-      if (match.isDemo) {
-        console.log(`🎮 Demo match finished! Scoring ${predictions.length} predictions for: ${match.homeTeam} ${match.homeScore} - ${match.awayScore} ${match.awayTeam}`);
-      } else {
-        console.log(`🎯 משחק הסתיים! ניקוד אוטומטי למשחק ${match.id}: ${match.homeTeam} ${match.homeScore} - ${match.awayScore} ${match.awayTeam}`);
-      }
+      console.log(`🎯 משחק הסתיים! ניקוד אוטומטי למשחק ${match.id}: ${match.homeTeam} ${match.homeScore} - ${match.awayScore} ${match.awayTeam} (${predictions.length} ניחושים)`);
 
       // Score all predictions for this match
       let scoredCount = 0;
@@ -138,25 +133,39 @@ class AutoScoringService {
         prediction.isScored = true;
 
         await prediction.save();
+        
+        // Log prediction update
+        console.log(`💾 Updated prediction for ${prediction.user}: ${prediction.homeScore}-${prediction.awayScore} → ${match.homeScore}-${match.awayScore} (${points} points, ${prediction.isExactScore ? 'exact' : prediction.isCorrectResult ? 'correct' : 'wrong'})`);
 
         // Update user statistics
         await this.updateUserStats(prediction.user, points, prediction.isExactScore, prediction.isCorrectResult);
         
         scoredCount++;
+        
+        // Log individual prediction scoring
+        console.log(`📝 ${prediction.user}: ${prediction.homeScore}-${prediction.awayScore} → ${match.homeScore}-${match.awayScore} = ${points} נקודות (${prediction.isExactScore ? 'מדויק' : prediction.isCorrectResult ? 'נכון' : 'שגוי'})`);
       }
 
       if (match.isDemo) {
         console.log(`🎮 Demo match scoring completed! ${scoredCount} predictions scored for: ${match.homeTeam} ${match.homeScore} - ${match.awayScore} ${match.awayTeam}`);
       } else {
-        console.log(`✅ ניקוד הושלם! ${scoredCount} ניחושים קיבלו נקודות למשחק ${match.id}`);
+        console.log(`✅ ניקוד הושלם! ${scoredCount} ניחושים קיבלו נקודות למשחק ${match.id} (${match.homeTeam} ${match.homeScore} - ${match.awayScore} ${match.awayTeam})`);
+        
+        // Emit match scored event to update client
+        if (global.io) {
+          global.io.emit('matchScored', {
+            matchId: match.id,
+            homeTeam: match.homeTeam,
+            awayTeam: match.awayTeam,
+            homeScore: match.homeScore,
+            awayScore: match.awayScore,
+            scoredCount
+          });
+        }
       }
 
     } catch (error) {
-      if (match.isDemo) {
-        console.error(`🎮 Error scoring demo match ${match.id}:`, error);
-      } else {
-        console.error(`❌ שגיאה בניקוד משחק ${match.id}:`, error);
-      }
+      console.error(`❌ שגיאה בניקוד משחק ${match.id} (${match.homeTeam} ${match.homeScore} - ${match.awayScore} ${match.awayTeam}):`, error);
     }
   }
 
@@ -213,9 +222,33 @@ class AutoScoringService {
 
       await user.save();
       
-      // Log only significant updates (points > 0)
-      if (points > 0) {
-        console.log(`📊 ${username} קיבל ${points} נקודות! (${isExactScore ? 'תוצאה מדויקת' : 'תוצאה נכונה'})`);
+      // Log all updates for debugging
+      console.log(`📊 ${username} - נקודות: ${points}, סך הכל: ${user.totalScore}, ניחושים: ${user.totalPredictions}, נכונים: ${user.correctPredictions}, מדויקים: ${user.exactScorePredictions} (${isExactScore ? 'מדויק' : isCorrectResult ? 'נכון' : 'שגוי'})`);
+      
+      // Emit socket event to update client in real-time
+      if (global.io) {
+        global.io.emit('userStatsUpdated', {
+          username,
+          totalScore: user.totalScore,
+          totalPredictions: user.totalPredictions,
+          correctPredictions: user.correctPredictions,
+          exactScorePredictions: user.exactScorePredictions
+        });
+        
+        // Also emit leaderboard update
+        global.io.emit('leaderboardUpdated');
+        
+        // Emit user profile update
+        global.io.emit('userProfileUpdated', {
+          username,
+          totalScore: user.totalScore,
+          totalPredictions: user.totalPredictions,
+          correctPredictions: user.correctPredictions,
+          exactScorePredictions: user.exactScorePredictions
+        });
+        
+        // Emit general update event
+        global.io.emit('updateRequired');
       }
 
     } catch (error) {

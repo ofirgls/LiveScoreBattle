@@ -10,6 +10,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import MatchesByCompetition from './components/MatchesByCompetition';
 import UserProfile from './components/UserProfile';
+import ErrorModal from './components/ErrorModal';
 
 
 const socket = io('http://localhost:5001');
@@ -29,6 +30,8 @@ function App() {
   const [showProfile, setShowProfile] = useState(false);
   const [showPredictionForm, setShowPredictionForm] = useState(false);
   const [showPredictionsList, setShowPredictionsList] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorModalMessage, setErrorModalMessage] = useState('');
 
   useEffect(() => {
     // Check if user is already logged in
@@ -164,10 +167,19 @@ function App() {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
       } else {
-        setMessage({ 
-          type: 'error', 
-          text: err.response?.data?.error || 'שגיאה בשליחת הניחוש' 
-        });
+        const errorMessage = err.response?.data?.error || 'שגיאה בשליחת הניחוש';
+        
+        // If it's a duplicate prediction error, show error modal only
+        if (errorMessage.includes('כבר ניחשת')) {
+          setErrorModalMessage('כבר ניחשת את המשחק הזה!');
+          setShowErrorModal(true);
+        } else {
+          // Show other errors in the main page
+          setMessage({ 
+            type: 'error', 
+            text: errorMessage
+          });
+        }
       }
     }
   };
@@ -313,6 +325,13 @@ function App() {
         <UserProfile 
           user={user} 
           onClose={() => setShowProfile(false)} 
+        />
+      )}
+
+      {showErrorModal && (
+        <ErrorModal
+          message={errorModalMessage}
+          onClose={() => setShowErrorModal(false)}
         />
       )}
     </div>
